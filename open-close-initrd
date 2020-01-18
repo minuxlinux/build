@@ -1,0 +1,42 @@
+#/bin/bash
+#=======================HEADER====================================================|
+#AUTOR
+# Jefferson 'Slackjeff' Rocha <root@slackjeff.com.br>
+#
+#Script para abrir e criar um novo initrd.img do minuX. Usado para Live de instalação.
+#Deve ser executado dentro de 'isolinux' para poder ser feita a edição.
+#==================================================================================|
+
+#========================= VARS
+ARCHIVE='initrd.img'
+TEMPORAL_DIR='temp_initrd' # Diretório para "hospedar" initrd
+
+find . | cpio --create --format='newc' > /tmp/newinitrd
+
+case $1 in
+    -o|o|open)
+	    mkdir -v "${TEMPORAL_DIR}"
+		if [[ -e "${ARCHIVE}" ]]; then
+			mv ${ARCHIVE} ${TEMPORAL_DIR}
+		else
+			echo "${ARCHIVE} NÃO FOI ENCONTRADO NESTE DIRETÓRIO."
+			exit 1
+		fi
+		cd ${TEMPORAL_DIR}
+	    if [[ $(file initrd.img | grep -o 'gzip') = gzip ]]; then
+			echo "O $ARCHIVE está comprimido com gzip. Transformando em CPIO ARCHIVE."
+			mv "$ARCHIVE" "${ARCHIVE}.gz" && gzip -d "${ARCHIVE}.gz"
+		fi
+		cpio -id < $ARCHIVE
+	;;
+	-c|c|--create)
+	    # Initrd.img está dentro do diretório?
+	    [[ -e "${ARCHIVE}" ]] && rm ${ARCHIVE}
+		echo "Criando initrd.img em /tmp/initrd.img.new"
+		find . | cpio --create --format='newc' > /tmp/initrd.img.new
+	;;
+	*)
+		echo "Ops, opções: -o/open -c/create disponiveis."
+		exit 0
+	;;
+esac
