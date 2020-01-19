@@ -1,2 +1,2 @@
 # build
-Scripts de contrução da iso
+Scripts de construção da iso
