@@ -21,6 +21,22 @@ type mkisofs &>/dev/null || { echo "mkisofs Não foi encontrado."; exit 1;}
 [[ -z "$1" ]] && { echo "Passe um diretorio."; exit 1 ;}
 pushd $1
 
+# Verificando arquivos da raiz do sistema
+for file in isolinux/{efiboot.img,iso{.sort,isolinux.b{in,oot}}}
+do
+
+echo -n "Verificando arquivo $file: "
+
+if [[ -e $file ]]
+then
+    echo OK
+else
+    echo "falha ao encontrar arquivo $file"
+    exit 1
+fi
+
+done 
+
 #==============================| INICIO
 
 echo "Executando mkisofs..."
